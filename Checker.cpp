@@ -1,22 +1,38 @@
-#include <assert.h>
 #include <iostream>
-using namespace std;
 
-bool batteryIsOk(float temperature, float soc, float chargeRate) {
-  if(temperature < 0 || temperature > 45) {
-    cout << "Temperature out of range!\n";
+bool is_within_limits(float temperature, float soc, float cnn) {
+    return (temperature >= 0 && temperature <= 45) &&
+           (soc >= 20 && soc <= 80) &&
+           (cnn <= 0.8) &&
+           (cnn <= 3);  // Added cnn <= 3 condition
+}
+
+bool battery_is_ok(float temperature, float soc, float cnn) {
+    if (is_within_limits(temperature, soc, cnn)) {
+        return true;
+    }
+    std::cout << "Temperature, State of Charge and Charge Rate is out of range!" << std::endl;
     return false;
-  } else if(soc < 20 || soc > 80) {
-    cout << "State of Charge out of range!\n";
-    return false;
-  } else if(chargeRate > 0.8) {
-    cout << "Charge Rate out of range!\n";
-    return false;
-  }
-  return true;
 }
 
 int main() {
-  assert(batteryIsOk(25, 70, 0.7) == true);
-  assert(batteryIsOk(50, 85, 0) == false);
+    if (battery_is_ok(25, 70, 0.7)) {
+        std::cout << "Battery is OK for (25, 70, 0.7)" << std::endl;
+    } else {
+        std::cout << "Battery check failed for (25, 70, 0.7)" << std::endl;
+    }
+
+    if (!battery_is_ok(50, 85, 0)) {
+        std::cout << "Battery check failed as expected for (50, 85, 0)" << std::endl;
+    } else {
+        std::cout << "Battery is OK for (50, 85, 0), which is unexpected" << std::endl;
+    }
+
+    if (!battery_is_ok(30, 50, 3.5)) {
+        std::cout << "Battery check failed as expected for cnn > 3 (3.5)" << std::endl;
+    } else {
+        std::cout << "Battery is OK for cnn > 3, which is unexpected" << std::endl;
+    }
+
+    return 0;
 }
